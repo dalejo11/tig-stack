@@ -1,2 +1,2 @@
-# tig-stack
+## tig-stack
 Telegraf InfluxDB Grafana
