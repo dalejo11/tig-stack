@@ -1,0 +1,50 @@
+version: "3"
+
+services:
+  influxdb:
+    image: influxdb:latest
+    hostname: influxdb
+    container_name: influxdb
+    restart: always
+#    ports:
+#    - "8086:8086"
+    dns:
+      - ${VAR}
+    networks:
+     private_network:
+      ipv4_address: ${VAR}
+    volumes:
+      - /srv/docker/tig/influxdb/data:/var/lib/influxdb2
+      - /srv/docker/tig/influxdb/config:/etc/influxdb2
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=${VAR}
+      - DOCKER_INFLUXDB_INIT_PASSWORD=${VAR}
+      - DOCKER_INFLUXDB_INIT_ORG=${VAR}
+      - DOCKER_INFLUXDB_INIT_BUCKET=${VAR}
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${VAR}
+
+  grafana:
+    image: grafana/grafana:latest
+    hostname: grafana
+    container_name: grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - TZ=Europe/Madrid
+    dns:
+      - ${VAR}
+    networks:
+     private_network:
+      ipv4_address: ${VAR}
+    volumes:
+    - /srv/docker/tig/grafana/provisioning:/etc/grafana/provisioning
+    - /srv/docker/tig/grafana/data:/var/lib/grafana
+    depends_on:
+      - influxdb
+
+networks:
+  private_network:
+    name: ${VAR}
+    external: true
